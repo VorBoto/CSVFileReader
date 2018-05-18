@@ -57,7 +57,8 @@ public class CSVFileReader1{
 	    line = inputFile.nextLine();
 	    this.body[i] = getEntries(line, columns);
 	}
-	    
+
+	inputFile.close();
 	
     }
 
@@ -131,7 +132,9 @@ public class CSVFileReader1{
 	    
 	    columns++;
 	}
-		
+
+	input.close();
+	
 	return columns;
 	
     }
@@ -157,7 +160,9 @@ public class CSVFileReader1{
 	    input.nextLine();
 	    rows++;
 	}
-       	    
+
+	input.close();
+	
 	return rows;
     }
 
