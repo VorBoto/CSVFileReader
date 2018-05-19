@@ -35,31 +35,33 @@ public class CSVFileReader1{
 	
 	try{
 	    inputFile = new Scanner(new FileInputStream(filename));
+	
+	    /*
+	     * Check if the file has a header and if it does grab that 
+	     * information and place it in the header array.
+	     * Then instanciate the 2D array that is the body of the csv file.
+	     */
+	    if (hasHeader){
+		this.body = new String[rows-1][columns];
+		line = inputFile.nextLine();
+		this.header = getEntries(line, columns);
+	    } else {
+		this.body = new String[rows][columns];
+	    }
+
+	    for(int i=0; i<body.length; i++){
+		line = inputFile.nextLine();
+		this.body[i] = getEntries(line, columns);
+	    }
+	    
 	} catch (FileNotFoundException e){
 	    System.out.println("File is not found.");
 	    System.exit(0);
+	} finally {
+	    if (inputFile != null){
+		inputFile.close();
+	    }
 	}
-	
-	/*
-	 * Check if the file has a header and if it does grab that 
-	 * information and place it in the header array.
-	 * Then instanciate the 2D array that is the body of the csv file.
-	 */
-	if (hasHeader){
-	    this.body = new String[rows-1][columns];
-	    line = inputFile.nextLine();
-	    this.header = getEntries(line, columns);
-	} else {
-	    this.body = new String[rows][columns];
-	}
-
-	for(int i=0; i<body.length; i++){
-	    line = inputFile.nextLine();
-	    this.body[i] = getEntries(line, columns);
-	}
-
-	inputFile.close();
-	
     }
 
     /**
@@ -92,51 +94,53 @@ public class CSVFileReader1{
 	
 	try{
 	    input = new Scanner(new FileInputStream(filename));
+
+	    line = input.nextLine();
+	    
+	    while(!line.isEmpty()){
+		char ch = line.charAt(0);
+		String entry = "";
+		if (ch == '"'){
+		    
+		    index = line.indexOf("\"",1);
+		    entry = line.substring(1,index);
+		    line = line.substring(index+1);
+		    
+		    if (line.length() > 1){
+			ch = line.charAt(0);
+			
+			//if (ch == ','){
+			if (ch == this.delimiter){
+			    line = line.substring(1);
+			}
+		    }
+		} else {
+		    
+		    //if (line.contains(",")){
+		    if(line.contains(String.valueOf(this.delimiter))){
+			//index = line.indexOf(",");
+			index = line.indexOf(this.delimiter);
+			entry = line.substring(0,index);
+			line = line.substring(index+1);
+		    } else {
+			entry = line.substring(0,line.length());
+			line = line.substring(line.length());
+		    }	    
+		}
+		
+		columns++;
+	    }
+	    
 	} catch (FileNotFoundException e){
 	    System.out.println("File is not found.");
 	    System.exit(0);
-	}
-
-	line = input.nextLine();
-	
-	while(!line.isEmpty()){
-	    char ch = line.charAt(0);
-	    String entry = "";
-	    if (ch == '"'){
-		
-		index = line.indexOf("\"",1);
-		entry = line.substring(1,index);
-		line = line.substring(index+1);
-
-		if (line.length() > 1){
-		    ch = line.charAt(0);
-
-		    //if (ch == ','){
-		    if (ch == this.delimiter){
-			line = line.substring(1);
-		    }
-		}
-	    } else {
-		
-		//if (line.contains(",")){
-		if(line.contains(String.valueOf(this.delimiter))){
-		    //index = line.indexOf(",");
-		    index = line.indexOf(this.delimiter);
-		    entry = line.substring(0,index);
-		    line = line.substring(index+1);
-		} else {
-		    entry = line.substring(0,line.length());
-		    line = line.substring(line.length());
-		}	    
+	} finally {
+	    if (input != null){
+		input.close();
 	    }
-	    
-	    columns++;
 	}
-
-	input.close();
-	
+	    
 	return columns;
-	
     }
 
     /**
@@ -151,18 +155,20 @@ public class CSVFileReader1{
 	
 	try{
 	    input = new Scanner(new FileInputStream(filename));
+
+	    while(input.hasNextLine()){
+		input.nextLine();
+		rows++;
+	    }
 	} catch (FileNotFoundException e){
 	    System.out.println("File is not found.");
 	    System.exit(0);
+	} finally {
+	    if (input != null){
+		input.close();
+	    }
 	}
-
-	while(input.hasNextLine()){
-	    input.nextLine();
-	    rows++;
-	}
-
-	input.close();
-	
+	    
 	return rows;
     }
 
